@@ -58,4 +58,44 @@ public class AccountDAOImplimentation implements AccountDAO{
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void withdraw(Connection conn, int accountId, double amount) throws SQLException{
+        String sql = "update customers set balance = balance - ? where user_id = ?";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setDouble(1, amount);
+        ps.setInt(2, accountId);
+        ps.executeUpdate();
+    }
+
+    @Override
+    public void deposit(Connection conn, int accountId, double amount) throws SQLException {
+        String sql = "UPDATE customers SET balance = balance + ? WHERE user_id = ?";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setDouble(1, amount);
+        ps.setInt(2, accountId);
+        ps.executeUpdate();
+    }
+
+    @Override
+    public Account getAccountById(Connection conn, int accountId) throws SQLException {
+
+        String sql = "SELECT * FROM customers WHERE user_id = ?";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, accountId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return new Account(
+                        rs.getInt("user_id"),
+                        rs.getString("name"),
+                        rs.getDouble("balance")
+                );
+            }
+        }
+
+        return null;
+    }
 }

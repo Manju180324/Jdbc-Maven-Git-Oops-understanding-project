@@ -17,7 +17,12 @@ Cashier does NOT decide.
 package org.bank;
 
 import org.bank.account.Account;
+import org.bank.account.AccountDAOImplimentation;
 import org.bank.account.AccountServices;
+import org.bank.account.AccountDAO;
+import org.bank.transaction.TransactionDAO;
+import org.bank.transaction.TransactionDAOImplimentation;
+import org.bank.transaction.TransactionService;
 
 import java.sql.SQLOutput;
 import java.util.*;
@@ -27,7 +32,13 @@ public class App
     public static void main( String[] args )
     {
         Scanner sc = new Scanner(System.in);
+
+        // DAO Layer
+        AccountDAO accountDAO = new AccountDAOImplimentation();
+        TransactionDAO transactionDAO = new TransactionDAOImplimentation();
+
         AccountServices service = new AccountServices();
+        TransactionService transactionService = new TransactionService(accountDAO, transactionDAO);
 
         while(true){
             System.out.println("\n==== BANK MENU ====");
@@ -35,7 +46,8 @@ public class App
             System.out.println("2. View Account");
             System.out.println("3. Deposit");
             System.out.println("4. Withdraw");
-            System.out.println("5. Exit");
+            System.out.println("5. Transfer");
+            System.out.println("6. Exit");
             System.out.print("Enter choice: ");
 
             int choice = sc.nextInt();
@@ -60,9 +72,9 @@ public class App
 
                     Account account = service.viewAccount(user_id);
 
-                    System.out.println("User Id"+account.getId());
-                    System.out.println("Name"+account.getName());
-                    System.out.println("Balance"+account.getBalance());
+                    System.out.println("User Id: "+account.getId());
+                    System.out.println("Name: "+account.getName());
+                    System.out.println("Balance: "+account.getBalance());
 
                     break;
 
@@ -91,6 +103,23 @@ public class App
                     break;
 
                 case 5:
+                    System.out.print("Enter FROM account ID: ");
+                    int fromId = sc.nextInt();
+
+                    System.out.print("Enter TO account ID: ");
+                    int toId = sc.nextInt();
+
+                    System.out.print("Enter amount: ");
+                    amount = sc.nextDouble();
+
+                    if (fromId != toId) {
+                        transactionService.transfer(fromId, toId, amount);
+                    }else{
+                        throw new IllegalArgumentException("Cannot transfer to same account");
+                    }
+                    break;
+
+                case 6:
                     System.out.println("Exiting...");
                     System.exit(0);
 

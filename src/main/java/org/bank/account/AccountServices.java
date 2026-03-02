@@ -7,6 +7,8 @@ Calls DAO only after validation passes
  */
 package org.bank.account;
 
+import java.sql.SQLException;
+
 public class AccountServices {
     private AccountDAO accountDAO;
 
@@ -33,28 +35,37 @@ public class AccountServices {
         return account;
     }
 
-    public void deposit(int user_id, double amount){
-        if (amount <= 0){
-            throw new RuntimeException("Invalid amount");
+    public void deposit(int user_id, double amount) {
+        try {
+            if (amount <= 0) {
+                throw new RuntimeException("Invalid amount");
+            }
+
+            Account account = viewAccount(user_id);
+            double newBalance = account.getBalance() + amount;
+
+            accountDAO.updateBalance(user_id, newBalance);
+
+        }catch (SQLException e){
+            e.printStackTrace();
         }
-
-        Account account = viewAccount(user_id);
-        double newBalance = account.getBalance() + amount;
-
-        accountDAO.updateBalance(user_id, newBalance);
     }
 
-    public void withdraw(int user_id, double amount){
-        if (amount <= 0){
-            throw new RuntimeException("Invalid amount");
-        }
+    public void withdraw(int user_id, double amount) {
+        try {
+            if (amount <= 0) {
+                throw new RuntimeException("Invalid amount");
+            }
 
-        Account account = viewAccount(user_id);
-        if (account.getBalance() < amount){
-            throw new RuntimeException("Insufficient balance");
-        }
+            Account account = viewAccount(user_id);
+            if (account.getBalance() < amount) {
+                throw new RuntimeException("Insufficient balance");
+            }
 
-        double newBalance = account.getBalance() - amount;
-        accountDAO.updateBalance(user_id, newBalance);
+            double newBalance = account.getBalance() - amount;
+            accountDAO.updateBalance(user_id, newBalance);
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
     }
 }
