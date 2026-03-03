@@ -78,7 +78,7 @@ public class AccountDAOImplimentation implements AccountDAO{
     }
 
     @Override
-    public Account getAccountById(Connection conn, int accountId) throws SQLException {
+    public Account getAccountById(Connection conn, int accountId) throws SQLException { // used for transaction purpose
 
         String sql = "SELECT * FROM customers WHERE user_id = ?";
 
